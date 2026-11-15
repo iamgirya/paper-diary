@@ -1,0 +1,138 @@
+@font-face { font-family: "Caveat"; src: url("fonts/Caveat.ttf") format("truetype"); font-weight: 400 700; }
+@font-face { font-family: "Neucha"; src: url("fonts/Neucha.ttf") format("truetype"); }
+
+:root {
+  --cell: 24px;
+  --paper: #fbfaf4;
+  --outside: #e9e6dc;
+  --grid: rgba(70, 110, 170, 0.16);
+  --rule: #3f51a3;
+  --ink: #1f2c80;
+  --muted: rgba(63, 81, 163, 0.55);
+  --hand: "Caveat", "Segoe Print", cursive;
+}
+
+* { box-sizing: border-box; }
+html, body { margin: 0; height: 100%; overflow: hidden; background: var(--outside); }
+body { font-family: var(--hand); color: var(--ink); user-select: none; -webkit-user-select: none; }
+button { font: inherit; color: inherit; background: none; border: 0; cursor: pointer; }
+.hidden { display: none !important; }
+
+#page {
+  position: absolute; top: 0; left: 50%; transform: translateX(-50%);
+  background-color: var(--paper);
+  background-image:
+    linear-gradient(to right, var(--grid) 1px, transparent 1px),
+    linear-gradient(to bottom, var(--grid) 1px, transparent 1px);
+  background-size: var(--cell) var(--cell);
+  box-shadow: 0 0 calc(var(--cell) * 0.6) rgba(0,0,0,0.12);
+}
+
+/* top bar: 2 cells */
+#bar {
+  height: calc(var(--cell) * 2);
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 calc(var(--cell) * 0.5);
+  font-size: calc(var(--cell) * 1.15);
+}
+#bar .nav, #bar .right { display: flex; align-items: center; gap: calc(var(--cell) * 0.3); }
+#bar button { padding: 0 calc(var(--cell) * 0.3); border-radius: 6px; color: var(--muted); line-height: 1.4; }
+#bar button:hover { color: var(--ink); background: rgba(63,81,163,0.08); }
+#range { color: var(--ink) !important; min-width: calc(var(--cell) * 9); font-weight: 600; }
+#prev, #next { font-size: 1.3em; }
+#today { font-size: 0.85em; }
+#jump { position: absolute; opacity: 0; pointer-events: none; width: 1px; height: 1px; left: calc(var(--cell) * 2); top: calc(var(--cell) * 1.5); }
+#backupState { font-size: 0.75em; color: #b0492f !important; }
+
+#week { position: relative; }
+
+.day {
+  position: absolute; overflow: hidden;
+  border-top: 2px solid var(--rule);
+}
+.day.col1 { border-left: 2px solid var(--rule); }
+.day.sun { border-bottom: 2px solid var(--rule); }
+.day.today .num {
+  position: absolute; left: calc(var(--cell) * 0.3); top: calc(var(--cell) * 0.1); z-index: 2;
+  font-size: calc(var(--cell) * 1.1); line-height: 1.1;
+  font-weight: 600; color: var(--rule);
+  pointer-events: none; white-space: nowrap;
+}
+.num .month { margin-left: 0.3em; }
+.day.today .num { text-decoration: underline; text-decoration-color: rgba(214, 72, 52, 0.7); text-underline-offset: 0.15em; }
+
+.mood {
+  position: absolute; right: calc(var(--cell) * 0.25); top: calc(var(--cell) * 0.25); z-index: 2;
+  width: calc(var(--cell) * 1.1); height: calc(var(--cell) * 1.1);
+  border-radius: 50%; border: 1.5px solid rgba(63,81,163,0.14);
+  display: flex; align-items: center; justify-content: center;
+  font-family: "Segoe UI Emoji", "Apple Color Emoji", sans-serif;
+  font-size: calc(var(--cell) * 0.8); line-height: 1; padding: 0;
+  transition: border-color .15s;
+}
+.mood:hover { border-color: rgba(63,81,163,0.5); }
+.mood.set { border-color: transparent; font-size: calc(var(--cell) * 1.0); }
+
+.note {
+  position: absolute; z-index: 1;
+  transform-origin: 0 0;
+  white-space: pre; line-height: 1.15;
+  min-width: 0.6em; min-height: 1.15em;
+  outline: none; cursor: text;
+  user-select: text; -webkit-user-select: text;
+  padding: 0 0.08em;
+  caret-color: currentColor;
+}
+.note.active { background: rgba(63,81,163,0.05); box-shadow: 0 0 0 1px rgba(63,81,163,0.18); border-radius: 3px; }
+.note.dragging { cursor: grabbing; opacity: 0.85; }
+body.alt .note { cursor: grab; }
+
+#toolbar {
+  position: fixed; z-index: 20;
+  display: flex; align-items: center; gap: 2px;
+  padding: 3px 5px; border-radius: 9px;
+  background: #fffdf7; border: 1px solid rgba(63,81,163,0.25);
+  box-shadow: 0 3px 12px rgba(30,40,90,0.15);
+  font-family: "Segoe UI", sans-serif; font-size: 14px; color: var(--rule);
+}
+#toolbar button { min-width: 26px; height: 26px; border-radius: 6px; padding: 0 4px; }
+#toolbar button:hover { background: rgba(63,81,163,0.1); }
+#toolbar .handle { cursor: grab; }
+#toolbar .sep { width: 1px; height: 18px; background: rgba(63,81,163,0.2); margin: 0 3px; }
+#toolbar .inks { display: flex; gap: 3px; }
+#toolbar .ink { width: 16px; min-width: 16px; height: 16px; border-radius: 50%; padding: 0; border: 2px solid transparent; }
+#toolbar .ink.on { border-color: #fff; box-shadow: 0 0 0 1.5px var(--rule); }
+
+#moodPicker {
+  position: fixed; z-index: 25;
+  display: grid; grid-template-columns: repeat(6, 1fr); gap: 2px;
+  padding: 6px; border-radius: 10px; background: #fffdf7;
+  border: 1px solid rgba(63,81,163,0.25); box-shadow: 0 3px 12px rgba(30,40,90,0.18);
+}
+#moodPicker button { font-family: "Segoe UI Emoji", sans-serif; font-size: 22px; width: 38px; height: 38px; border-radius: 8px; }
+#moodPicker button:hover { background: rgba(63,81,163,0.1); }
+#moodPicker .clear { grid-column: 1 / -1; width: auto; height: 26px; font-family: var(--hand); font-size: 18px; color: var(--muted); }
+
+#menu {
+  position: fixed; z-index: 30; right: 10px;
+  display: flex; flex-direction: column; min-width: 250px;
+  padding: 6px; border-radius: 10px; background: #fffdf7;
+  border: 1px solid rgba(63,81,163,0.25); box-shadow: 0 6px 20px rgba(30,40,90,0.18);
+  font-size: 22px;
+}
+#menu button { text-align: left; padding: 3px 10px; border-radius: 6px; }
+#menu button:hover { background: rgba(63,81,163,0.1); }
+#menu hr { border: 0; border-top: 1px solid rgba(63,81,163,0.15); margin: 4px 6px; width: auto; }
+
+#help, #dlg { position: fixed; inset: 0; z-index: 40; background: rgba(20,25,50,0.25); display: flex; align-items: center; justify-content: center; }
+#help .card, #dlg .card { background: var(--paper); padding: 20px 30px; border-radius: 12px; max-width: 760px; font-size: 22px; box-shadow: 0 10px 40px rgba(0,0,0,0.25); }
+#help h2 { margin: 0 0 8px; }
+#help ul { padding-left: 20px; margin: 0 0 12px; }
+#help li { margin: 4px 0; }
+#help button, #dlg button { font-size: 22px; padding: 4px 18px; border-radius: 8px; border: 1.5px solid var(--rule); }
+
+#toast {
+  position: fixed; z-index: 50; left: 50%; bottom: 24px; transform: translateX(-50%);
+  background: #26306b; color: #fff; padding: 8px 18px; border-radius: 10px;
+  font-family: "Segoe UI", sans-serif; font-size: 15px; box-shadow: 0 4px 16px rgba(0,0,0,0.25);
+}

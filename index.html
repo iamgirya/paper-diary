@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Дневник</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div id="page">
+  <header id="bar">
+    <div class="nav">
+      <button id="prev" title="Предыдущая неделя (Alt+←, PageUp)">‹</button>
+      <button id="range" title="Перейти к дате"></button>
+      <button id="next" title="Следующая неделя (Alt+→, PageDown)">›</button>
+      <button id="today" title="Текущая неделя (Alt+Home)">сегодня</button>
+      <input type="date" id="jump" tabindex="-1">
+    </div>
+    <div class="right">
+      <button id="backupState" class="hidden"></button>
+      <button id="menuBtn" title="Меню">☰</button>
+    </div>
+  </header>
+  <main id="week"></main>
+</div>
+
+<div id="toolbar" class="hidden">
+  <button data-act="move" class="handle" title="Перетащить (или Alt + тянуть за текст)">✥</button>
+  <span class="sep"></span>
+  <button data-act="smaller" title="Меньше (Ctrl + колесо вниз, Ctrl+-)">A−</button>
+  <button data-act="bigger" title="Больше (Ctrl + колесо вверх, Ctrl+=)">A+</button>
+  <span class="sep"></span>
+  <button data-act="rotl" title="Повернуть против часовой (Alt + колесо)">↺</button>
+  <button data-act="rotr" title="Повернуть по часовой (Alt + колесо)">↻</button>
+  <button data-act="side" title="Боком: 0° → −90° → 90° → 0°">⟂</button>
+  <span class="sep"></span>
+  <span class="inks"></span>
+  <span class="sep"></span>
+  <button data-act="del" title="Удалить запись">✕</button>
+</div>
+
+<div id="moodPicker" class="hidden"></div>
+
+<div id="menu" class="hidden">
+  <button data-menu="export">Экспорт в файл (.json)…</button>
+  <button data-menu="import">Импорт из файла…</button>
+  <button data-menu="exportTxt">Экспорт в текст (.txt)…</button>
+  <hr>
+  <button data-menu="linkBackup">Файл автобэкапа…</button>
+  <button data-menu="unlinkBackup">Отвязать автобэкап</button>
+  <hr>
+  <button data-menu="font">Шрифт: <span id="fontName"></span></button>
+  <button data-menu="fullscreen">Полный экран (F11)</button>
+  <button data-menu="help">Подсказки</button>
+  <button data-menu="close">Закрыть (Alt+F4)</button>
+</div>
+
+<div id="help" class="hidden">
+  <div class="card">
+    <h2>Как пользоваться</h2>
+    <ul>
+      <li><b>Клик</b> в любое место дня — начать запись прямо там.</li>
+      <li><b>Ctrl + колесо</b> или Ctrl+= / Ctrl+- — размер текста.</li>
+      <li><b>Alt + колесо</b> — повернуть запись (Shift — шагом 1°). Кнопка ⟂ — писать боком.</li>
+      <li><b>Alt + тянуть</b> за текст или за ✥ — передвинуть запись.</li>
+      <li><b>Esc</b> — закончить запись. Пустые записи исчезают сами.</li>
+      <li><b>Кружок</b> в углу дня — настроение.</li>
+      <li><b>Alt+← / Alt+→</b>, PageUp / PageDown — листать недели; <b>Alt+Home</b> — текущая.</li>
+      <li>Клик по датам сверху — перейти к любой дате.</li>
+      <li>Всё сохраняется само. Для бэкапа — меню ☰: экспорт или «Файл автобэкапа» (пишется при каждом изменении).</li>
+    </ul>
+    <button id="helpClose">Понятно</button>
+  </div>
+</div>
+
+<div id="toast" class="hidden"></div>
+<input type="file" id="importFile" accept=".json,application/json" class="hidden">
+
+<script src="app.js"></script>
+</body>
+</html>

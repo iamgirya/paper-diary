@@ -1,0 +1,4 @@
+.claude/
+*.json
+!package.json
+Thumbs.db
