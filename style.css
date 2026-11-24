@@ -13,7 +13,7 @@
 }
 
 * { box-sizing: border-box; }
-html, body { margin: 0; height: 100%; overflow: hidden; background: var(--outside); }
+html, body { margin: 0; height: 100%; overflow: clip; background: var(--outside); }
 body { font-family: var(--hand); color: var(--ink); user-select: none; -webkit-user-select: none; }
 button { font: inherit; color: inherit; background: none; border: 0; cursor: pointer; }
 .hidden { display: none !important; }
@@ -47,7 +47,7 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 #week { position: relative; }
 
 .day {
-  position: absolute; overflow: hidden;
+  position: absolute; overflow: clip; /* clip, не hidden: такой блок нельзя прокрутить, записи не «едут» */
   border-top: 2px solid var(--rule);
 }
 .day.col1 { border-left: 2px solid var(--rule); }

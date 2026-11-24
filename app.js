@@ -262,33 +262,22 @@ window.addEventListener('wheel', (e) => {
   else rotate(a, (delta < 0 ? -1 : 1) * (e.shiftKey ? 1 : 5));
 }, { passive: false });
 
-/* перетаскивание — в том числе в другой день */
+/* перетаскивание — запись всегда остаётся в своём дне */
 function startDrag(e, a) {
   e.preventDefault();
   const sx = e.clientX, sy = e.clientY, ox = a.n.x, oy = a.n.y;
+  const day = a.el.closest('.day');
+  const maxX = day.clientWidth / cell - 0.5, maxY = day.clientHeight / cell - 0.5;
   a.el.classList.add('dragging');
   const move = (ev) => {
-    a.n.x = r2(ox + (ev.clientX - sx) / cell);
-    a.n.y = r2(oy + (ev.clientY - sy) / cell);
+    a.n.x = r2(Math.min(maxX, Math.max(0, ox + (ev.clientX - sx) / cell)));
+    a.n.y = r2(Math.min(maxY, Math.max(-0.3, oy + (ev.clientY - sy) / cell)));
     styleNote(a.el, a.n); placeToolbar();
   };
-  const up = (ev) => {
+  const up = () => {
     window.removeEventListener('pointermove', move);
     window.removeEventListener('pointerup', up);
     a.el.classList.remove('dragging');
-    const target = document.elementsFromPoint(ev.clientX, ev.clientY).find((x) => x.classList && x.classList.contains('day'));
-    const from = a.el.closest('.day');
-    if (target && from && target !== from) {
-      const fr = from.getBoundingClientRect(), tr = target.getBoundingClientRect();
-      a.n.x = r2(a.n.x + (fr.left - tr.left) / cell);
-      a.n.y = r2(a.n.y + (fr.top - tr.top) / cell);
-      dayData(a.key).notes = dayData(a.key).notes.filter((x) => x !== a.n);
-      a.key = target.dataset.key;
-      dayData(a.key, true).notes.push(a.n);
-      target.appendChild(a.el);
-      styleNote(a.el, a.n);
-      a.el.focus();
-    }
     placeToolbar(); save();
   };
   window.addEventListener('pointermove', move);
@@ -600,6 +589,11 @@ function toast(t) {
   clearTimeout(toastTimer); toastTimer = setTimeout(() => el.classList.add('hidden'), 2600);
 }
 window.addEventListener('resize', layout);
+// Страховка: ничто на странице не должно прокручиваться, иначе записи сдвигаются все разом.
+document.addEventListener('scroll', (e) => {
+  const t = e.target === document ? document.scrollingElement : e.target;
+  if (t && (t.scrollTop || t.scrollLeft)) { t.scrollTop = 0; t.scrollLeft = 0; }
+}, true);
 window.addEventListener('beforeunload', () => { if (saveTimer) flush(); });
 document.addEventListener('visibilitychange', () => { if (document.hidden && saveTimer) flush(); });
 window.addEventListener('storage', (e) => { if (e.key === KEY && !active) { db = load(); render(); } });
