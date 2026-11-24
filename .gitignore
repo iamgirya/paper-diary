@@ -1,4 +1,10 @@
 .claude/
+Thumbs.db
+
+# Бэкапы и выгрузки дневника — никогда не коммитить
 *.json
 !package.json
-Thumbs.db
+diary_*.txt
+diary-*.txt
+backup*/
+backups/
